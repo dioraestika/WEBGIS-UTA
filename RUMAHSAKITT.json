@@ -1,0 +1,64 @@
+{
+"type": "FeatureCollection",
+"features": [
+
+{ "type":"Feature","properties":{"nama":"RSUD Prambanan"},"geometry":{"type":"Point","coordinates":[110.4487055,-7.8285417]}},
+
+{ "type":"Feature","properties":{"nama":"RSUP Dr. Sardjito"},"geometry":{"type":"Point","coordinates":[110.3570675,-7.7851411]}},
+
+{ "type":"Feature","properties":{"nama":"RSUD Wonosari"},"geometry":{"type":"Point","coordinates":[110.3460526,-7.9318813]}},
+
+{ "type":"Feature","properties":{"nama":"RS PKU Muhammadiyah Bantul"},"geometry":{"type":"Point","coordinates":[110.2245003,-7.9471928]}},
+
+{ "type":"Feature","properties":{"nama":"RS Bethesda Yogyakarta"},"geometry":{"type":"Point","coordinates":[110.4102422,-7.8483302]}},
+
+{ "type":"Feature","properties":{"nama":"RS Akademik UGM"},"geometry":{"type":"Point","coordinates":[110.373712,-7.7444637]}},
+
+{ "type":"Feature","properties":{"nama":"RSUP Dr. Sardjito"},"geometry":{"type":"Point","coordinates":[110.4100586,-7.7601905]}},
+
+{ "type":"Feature","properties":{"nama":"RS Panti Rapih"},"geometry":{"type":"Point","coordinates":[110.3722805,-7.7482207]}},
+
+{ "type":"Feature","properties":{"nama":"RS Bethesda Lempuyangwangi"},"geometry":{"type":"Point","coordinates":[110.3908845,-7.7833994]}},
+
+{ "type":"Feature","properties":{"nama":"RSUD Gunungkidul"},"geometry":{"type":"Point","coordinates":[110.5614765,-7.9224175]}},
+
+{ "type":"Feature","properties":{"nama":"RS PKU Muhammadiyah Gamping"},"geometry":{"type":"Point","coordinates":[110.3320585,-7.7677372]}},
+
+{ "type":"Feature","properties":{"nama":"RSUD Wates"},"geometry":{"type":"Point","coordinates":[110.6320452,-7.9891432]}},
+
+{ "type":"Feature","properties":{"nama":"RS Santa Elisabeth"},"geometry":{"type":"Point","coordinates":[110.295898,-7.9091703]}},
+
+{ "type":"Feature","properties":{"nama":"RSUD Panembahan Senopati Bantul"},"geometry":{"type":"Point","coordinates":[110.3097744,-8.387586]}},
+
+{ "type":"Feature","properties":{"nama":"RS Akademik UGM"},"geometry":{"type":"Point","coordinates":[110.3937875,-7.7262356]}},
+
+{ "type":"Feature","properties":{"nama":"RS Ludira Husada Tama"},"geometry":{"type":"Point","coordinates":[110.3431439,-7.8116781]}},
+
+{ "type":"Feature","properties":{"nama":"RS Bethesda Yogyakarta"},"geometry":{"type":"Point","coordinates":[110.4017351,-7.8405612]}},
+
+{ "type":"Feature","properties":{"nama":"RS PKU Muhammadiyah Yogyakarta"},"geometry":{"type":"Point","coordinates":[110.3395166,-7.7633501]}},
+
+{ "type":"Feature","properties":{"nama":"RS Panti Rapih"},"geometry":{"type":"Point","coordinates":[110.3222196,-7.7785173]}},
+
+{ "type":"Feature","properties":{"nama":"RS Mata Dr Yap"},"geometry":{"type":"Point","coordinates":[110.3201938,-7.8102559]}},
+
+{ "type":"Feature","properties":{"nama":"RSUD Wonosari"},"geometry":{"type":"Point","coordinates":[110.5805011,-7.9493588]}},
+
+{ "type":"Feature","properties":{"nama":"RS Bethesda Yogyakarta"},"geometry":{"type":"Point","coordinates":[110.3895273,-7.8424234]}},
+
+{ "type":"Feature","properties":{"nama":"RS PKU Muhammadiyah Gamping"},"geometry":{"type":"Point","coordinates":[110.3062511,-7.7738367]}},
+
+{ "type":"Feature","properties":{"nama":"RS Ludira Husada Tama"},"geometry":{"type":"Point","coordinates":[110.3298078,-7.8024702]}},
+
+{ "type":"Feature","properties":{"nama":"RSUD Bantul"},"geometry":{"type":"Point","coordinates":[110.1742826,-7.8670008]}},
+
+{ "type":"Feature","properties":{"nama":"RS Bethesda Yogyakarta"},"geometry":{"type":"Point","coordinates":[110.413987,-7.8291876]}},
+
+{ "type":"Feature","properties":{"nama":"RS Panti Rapih"},"geometry":{"type":"Point","coordinates":[110.3633677,-7.7573565]}},
+
+{ "type":"Feature","properties":{"nama":"RSUP Dr Sardjito"},"geometry":{"type":"Point","coordinates":[110.3769516,-7.7856374]}},
+
+{ "type":"Feature","properties":{"nama":"RSUD Wates"},"geometry":{"type":"Point","coordinates":[110.2128813,-7.7539435]}}
+
+]
+}

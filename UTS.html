@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>WebGIS Persebaran Rumah Sakit DIY</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="data/building_1.js"></script>
+
+<style>
+:root {
+  --bg: #0f1923;
+  --panel: #162030;
+  --panel2: #1c2b3a;
+  --accent: #00c9a7;
+  --accent2: #3b82f6;
+  --text: #e2e8f0;
+  --muted: #8a9ab5;
+  --border: rgba(255,255,255,0.07);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+<script src="data/building_1.js"></script>
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* TOPBAR */
+.topbar {
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.logo-svg {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.topbar-title {
+  flex: 1;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.topbar-badge {
+  background: rgba(0,201,167,0.12);
+  border: 1px solid rgba(0,201,167,0.3);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* LAYOUT */
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 300px;
+  min-width: 280px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-section {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.stat-row { display: flex; gap: 10px; }
+
+.stat-card {
+  flex: 1;
+  background: var(--panel2);
+  border-radius: 10px;
+  padding: 14px 12px;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.stat-lbl {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.nearest-panel {
+  background: var(--panel2);
+  border-radius: 10px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--muted);
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nearest-panel .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+
+.nearest-panel.found .dot { background: var(--accent); }
+.nearest-panel.found { color: var(--text); }
+.nearest-name { font-weight: 600; color: var(--text); font-size: 13px; }
+.nearest-dist { font-size: 11px; color: var(--accent); margin-top: 2px; }
+
+.btn-group-custom { display: flex; flex-direction: column; gap: 8px; }
+
+.btn-custom {
+  width: 100%;
+  padding: 11px 16px;
+  border: none;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.18s;
+}
+
+.btn-diy {
+  background: rgba(59,130,246,0.15);
+  border: 1px solid rgba(59,130,246,0.3);
+  color: #60a5fa;
+}
+.btn-diy:hover { background: rgba(59,130,246,0.25); transform: translateY(-1px); }
+
+.btn-loc {
+  background: rgba(0,201,167,0.12);
+  border: 1px solid rgba(0,201,167,0.3);
+  color: var(--accent);
+}
+.btn-loc:hover { background: rgba(0,201,167,0.22); transform: translateY(-1px); }
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+}
+
+.legend-icon-wrap {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: rgba(0,201,167,0.12);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.legend-icon-wrap img { width: 22px; height: 22px; }
+
+.petunjuk-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+.petunjuk-list li {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--muted);
+  align-items: flex-start;
+  line-height: 1.5;
+}
+
+.petunjuk-list li .num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: rgba(59,130,246,0.15);
+  border: 1px solid rgba(59,130,246,0.3);
+  color: #60a5fa;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.sidebar-scroll { overflow-y: auto; flex: 1; }
+.sidebar-scroll::-webkit-scrollbar { width: 4px; }
+.sidebar-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* MAP */
+.map-wrap { flex: 1; position: relative; display: flex; flex-direction: column; }
+#map { flex: 1; width: 100%; }
+
+.map-header {
+  position: absolute;
+  top: 12px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 500;
+  background: rgba(15,25,35,0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.map-footer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 32px;
+  background: rgba(15,25,35,0.75);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 14px;
+  font-size: 11px;
+  color: var(--muted);
+  z-index: 400;
+  pointer-events: none;
+}
+
+/* POPUP */
+.custom-popup .leaflet-popup-content-wrapper {
+  background: #162030;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  color: #e2e8f0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  padding: 0;
+}
+.custom-popup .leaflet-popup-tip { background: #162030; }
+.custom-popup .leaflet-popup-content { margin: 0; min-width: 210px; }
+
+.popup-inner { padding: 14px 16px; }
+.popup-tag {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  color: #00c9a7; margin-bottom: 6px;
+}
+.popup-name { font-size: 14px; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 8px; }
+.popup-coords {
+  font-size: 10px; color: #8a9ab5; font-family: monospace;
+  background: rgba(255,255,255,0.05);
+  padding: 5px 8px; border-radius: 6px;
+}
+
+/* CLUSTER */
+.custom-cluster { background: transparent; }
+.cluster-inner {
+  width: 40px; height: 40px;
+  background: rgba(0,201,167,0.2);
+  border: 2px solid rgba(0,201,167,0.5);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 13px;
+  color: #00c9a7;
+}
+
+/* TOOLTIP */
+.rs-tooltip {
+  background: #162030 !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  color: #e2e8f0 !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  padding: 5px 10px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+}
+</style>
+</head>
+
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <!-- Logo SVG Kesehatan (Palang Merah + Hati) -->
+    <svg class="logo-svg" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="36" height="36" rx="8" fill="#00c9a7"/>
+      <!-- Palang medis -->
+      <rect x="15" y="7" width="6" height="22" rx="3" fill="white"/>
+      <rect x="7" y="15" width="22" height="6" rx="3" fill="white"/>
+      <!-- Titik tengah -->
+      <circle cx="18" cy="18" r="3" fill="#00c9a7"/>
+    </svg>
+    <span style="color:#00c9a7">WebGIS</span>&nbsp;<span>Rumah Sakit</span>
+  </div>
+  <div class="topbar-title">Persebaran Rumah Sakit — Daerah Istimewa Yogyakarta</div>
+  <div class="topbar-badge">DIY 2026</div>
+</div>
+
+<!-- BODY -->
+<div class="app-body">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-scroll">
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Statistik</div>
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="stat-num" id="jumlahRS">—</div>
+            <div class="stat-lbl">Total RS</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">5</div>
+            <div class="stat-lbl">Kabupaten</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Rumah Sakit Terdekat</div>
+        <div class="nearest-panel" id="rsTerdekat">
+          <div class="dot"></div>
+          <span>Klik <b>Lokasi Saya</b> untuk menemukan RS terdekat</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Navigasi Peta</div>
+        <div class="btn-group-custom">
+          <button class="btn-custom btn-diy" onclick="map.flyTo([-7.80,110.37],11)">
+            🗺️ Tampilkan Seluruh DIY
+          </button>
+          <button class="btn-custom btn-loc" onclick="getLocation()">
+            📍 Lokasi Saya
+          </button>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Legenda</div>
+        <div class="legend-item">
+          <div class="legend-icon-wrap">
+            <img src="https://cdn-icons-png.flaticon.com/512/1484/1484843.png" alt="RS">
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:#e2e8f0">Rumah Sakit</div>
+            <div style="font-size:10px;color:#8a9ab5;margin-top:2px">Titik lokasi fasilitas kesehatan</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">Petunjuk Penggunaan</div>
+        <ul class="petunjuk-list">
+          <li><span class="num">1</span><span>Gunakan tombol <b>zoom</b> pada peta untuk memperbesar/memperkecil tampilan</span></li>
+          <li><span class="num">2</span><span>Klik <b>ikon rumah sakit</b> untuk melihat nama dan koordinat lengkap</span></li>
+          <li><span class="num">3</span><span>Gunakan kotak <b>pencarian</b> di sudut kanan atas peta untuk mencari lokasi</span></li>
+          <li><span class="num">4</span><span>Klik <b>Lokasi Saya</b> untuk menemukan RS terdekat dari posisi Anda</span></li>
+          <li><span class="num">5</span><span>Klik <b>angka cluster</b> untuk memperbesar area dengan banyak RS</span></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div style="padding:12px 20px;border-top:1px solid rgba(255,255,255,0.07);font-size:10px;color:#8a9ab5;text-align:center;">
+      Data: OpenStreetMap · DIY © 2026
+    </div>
+  </div>
+
+  <!-- MAP AREA -->
+  <div class="map-wrap">
+    <div class="map-header">🏥 Peta Interaktif Rumah Sakit DIY</div>
+    <div id="map"></div>
+    <div class="map-footer">Leaflet · © OpenStreetMap Contributors</div>
+  </div>
+
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+<script>
+// ── DATA RUMAH SAKIT ──
+var dataRS = {
+"type": "FeatureCollection",
+"features": [
+
+{"type":"Feature","properties":{"nama":"RSUP Dr. Sardjito"},"geometry":{"type":"Point","coordinates":[110.3570675,-7.7851411]}},
+
+{"type":"Feature","properties":{"nama":"RS Akademik UGM"},"geometry":{"type":"Point","coordinates":[110.373712,-7.7444637]}},
+
+{"type":"Feature","properties":{"nama":"RS Panti Rapih"},"geometry":{"type":"Point","coordinates":[110.3722805,-7.7482207]}},
+
+{"type":"Feature","properties":{"nama":"RS Bethesda Yogyakarta"},"geometry":{"type":"Point","coordinates":[110.3908845,-7.7833994]}},
+
+{"type":"Feature","properties":{"nama":"RS Mata Dr Yap"},"geometry":{"type":"Point","coordinates":[110.3201938,-7.8102559]}},
+
+{"type":"Feature","properties":{"nama":"RS PKU Muhammadiyah Yogyakarta"},"geometry":{"type":"Point","coordinates":[110.3395166,-7.7633501]}},
+
+{"type":"Feature","properties":{"nama":"RS Ludira Husada Tama"},"geometry":{"type":"Point","coordinates":[110.3431439,-7.8116781]}},
+
+{"type":"Feature","properties":{"nama":"Rumah Sakit Siloam Yogyakarta"},"geometry":{"type":"Point","coordinates":[110.3908845,-7.7833994]}},
+
+{"type":"Feature","properties":{"nama":"RS Rajawali Citra"},"geometry":{"type":"Point","coordinates":[110.4102422,-7.8483302]}},
+
+{"type":"Feature","properties":{"nama":"RSUD Panembahan Senopati Bantul"},"geometry":{"type":"Point","coordinates":[110.3324,-7.8889]}},
+
+{"type":"Feature","properties":{"nama":"RSUD Wonosari"},"geometry":{"type":"Point","coordinates":[110.5614765,-7.9224175]}},
+
+{"type":"Feature","properties":{"nama":"RSUD Wates"},"geometry":{"type":"Point","coordinates":[110.164,-7.862]}},
+
+{"type":"Feature","properties":{"nama":"RS PKU Muhammadiyah Gamping"},"geometry":{"type":"Point","coordinates":[110.331,-7.768]}},
+
+{"type":"Feature","properties":{"nama":"RS PKU Muhammadiyah Bantul"},"geometry":{"type":"Point","coordinates":[110.329,-7.882]}},
+
+{"type":"Feature","properties":{"nama":"RS PKU Muhammadiyah Nanggulan"},"geometry":{"type":"Point","coordinates":[110.2128813,-7.7539435]}},
+
+{"type":"Feature","properties":{"nama":"RS Condong Catur"},"geometry":{"type":"Point","coordinates":[110.410,-7.760]}},
+
+{"type":"Feature","properties":{"nama":"RS Bhayangkara Polda DIY"},"geometry":{"type":"Point","coordinates":[110.369,-7.782]}},
+
+{"type":"Feature","properties":{"nama":"RS Grhasia Pakem"},"geometry":{"type":"Point","coordinates":[110.421,-7.623]}},
+
+{"type":"Feature","properties":{"nama":"RS Nur Hidayah Bantul"},"geometry":{"type":"Point","coordinates":[110.361,-7.905]}},
+
+{"type":"Feature","properties":{"nama":"RS Santa Elisabeth Ganjuran"},"geometry":{"type":"Point","coordinates":[110.284,-7.944]}},
+
+{"type":"Feature","properties":{"nama":"RSUD Prambanan"},"geometry":{"type":"Point","coordinates":[110.488,-7.743]}},
+
+{"type":"Feature","properties":{"nama":"RS Sakina Idaman"},"geometry":{"type":"Point","coordinates":[110.408,-7.733]}},
+
+{"type":"Feature","properties":{"nama":"RS Queen Latifa"},"geometry":{"type":"Point","coordinates":[110.382,-7.843]}},
+
+{"type":"Feature","properties":{"nama":"RS Mitra Sehat Mandiri"},"geometry":{"type":"Point","coordinates":[110.356,-7.833]}}
+
+]
+}
+
+// ── MAP ──
+var map = L.map('map', { zoomControl: false }).setView([-7.80, 110.37], 11);
+
+L.control.zoom({ position: 'topleft' }).addTo(map);
+
+// OpenStreetMap tile
+var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+
+var satellite = L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+);
+
+var baseMaps = {
+  "OSM": osm,
+  "Satelit": satellite
+};
+
+L.control.layers(baseMaps).addTo(map);
+
+// default tampil satelit
+satellite.addTo(map);
+
+// Geocoder search
+L.Control.geocoder({ position: 'topright', placeholder: 'Cari lokasi...' }).addTo(map);
+
+// ── ICON ──
+var hospitalIcon = L.icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/1484/1484843.png",
+  iconSize: [36, 36],
+  iconAnchor: [18, 18],
+  popupAnchor: [0, -22]
+});
+
+// ── CLUSTER ──
+var cluster = L.markerClusterGroup({
+  iconCreateFunction: function(c) {
+    return L.divIcon({
+      html: '<div class="cluster-inner">' + c.getChildCount() + '</div>',
+      className: 'custom-cluster',
+      iconSize: L.point(40, 40)
+    });
+  }
+});
+
+var buildings = L.geoJSON(json_building_1, {
+  style: {
+    color: "#00c9a7",
+    weight: 1,
+    fillOpacity: 0.3
+  },
+  onEachFeature: function(feature, layer) {
+    layer.bindPopup("Bangunan");
+  }
+}).addTo(map);
+
+// ── RENDER DATA ──
+document.getElementById('jumlahRS').textContent = dataRS.features.length;
+
+var hospitals = L.geoJSON(dataRS, {
+  pointToLayer: function(feature, latlng) {
+    return L.marker(latlng, { icon: hospitalIcon });
+  },
+  onEachFeature: function(feature, layer) {
+    var nama = feature.properties.nama || "Rumah Sakit";
+    var lat  = feature.geometry.coordinates[1].toFixed(6);
+    var lng  = feature.geometry.coordinates[0].toFixed(6);
+
+    layer.bindPopup(
+      '<div class="popup-inner">' +
+        '<div class="popup-tag">🏥 Fasilitas Kesehatan</div>' +
+        '<div class="popup-name">' + nama + '</div>' +
+        '<div class="popup-coords">📍 ' + lat + ', ' + lng + '</div>' +
+      '</div>',
+      { className: 'custom-popup', maxWidth: 260 }
+    );
+
+    layer.bindTooltip(nama, {
+      permanent: false,
+      direction: 'top',
+      className: 'rs-tooltip'
+    });
+  }
+});
+
+cluster.addLayer(hospitals);
+map.addLayer(cluster);
+map.fitBounds(cluster.getBounds(), { padding: [20, 20] });
+
+// ── JARAK HAVERSINE ──
+function hitungJarak(lat1, lon1, lat2, lon2) {
+  var R = 6371;
+  var dLat = (lat2 - lat1) * Math.PI / 180;
+  var dLon = (lon2 - lon1) * Math.PI / 180;
+  var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+          Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+          Math.sin(dLon/2)*Math.sin(dLon/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// ── LOKASI SAYA ──
+var userMarker = null;
+
+function getLocation() {
+  map.locate({ setView: true, maxZoom: 15 });
+}
+
+map.on('locationfound', function(e) {
+  var uLat = e.latlng.lat;
+  var uLng = e.latlng.lng;
+
+  if (userMarker) map.removeLayer(userMarker);
+
+  var userIcon = L.divIcon({
+    html: '<div style="width:14px;height:14px;background:#3b82f6;border:3px solid white;border-radius:50%;box-shadow:0 0 12px #3b82f6"></div>',
+    className: '',
+    iconSize: [14, 14],
+    iconAnchor: [7, 7]
+  });
+
+  userMarker = L.marker(e.latlng, { icon: userIcon })
+    .addTo(map)
+    .bindPopup(
+      '<div class="popup-inner">' +
+        '<div class="popup-tag" style="color:#3b82f6">📍 Posisi Anda</div>' +
+        '<div class="popup-name">Lokasi Saya</div>' +
+      '</div>',
+      { className: 'custom-popup' }
+    )
+    .openPopup();
+
+  // Cari RS terdekat
+  var minDist = 999999, nearest = null;
+  dataRS.features.forEach(function(rs) {
+    var jarak = hitungJarak(uLat, uLng, rs.geometry.coordinates[1], rs.geometry.coordinates[0]);
+    if (jarak < minDist) { minDist = jarak; nearest = rs; }
+  });
+
+  if (nearest) {
+    var panel = document.getElementById('rsTerdekat');
+    panel.className = 'nearest-panel found';
+    panel.innerHTML =
+      '<div class="dot"></div>' +
+      '<div>' +
+        '<div class="nearest-name">' + nearest.properties.nama + '</div>' +
+        '<div class="nearest-dist">± ' + minDist.toFixed(2) + ' km dari lokasi Anda</div>' +
+      '</div>';
+
+    map.flyTo([nearest.geometry.coordinates[1], nearest.geometry.coordinates[0]], 14);
+  }
+});
+
+map.on('locationerror', function() {
+  alert('Lokasi tidak dapat diakses. Pastikan izin lokasi browser diaktifkan.');
+});
+</script>
+
+</body>
+</html>
